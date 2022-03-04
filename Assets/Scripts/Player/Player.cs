@@ -24,12 +24,16 @@ public class Player : MonoBehaviour {
     }
 
     void Update() {
-        Jump();
-        BowFire();
+        if(health > 0) {
+            Jump();
+            BowFire();
+        }
     }
 
     void FixedUpdate() {
-        Move();
+        if(health > 0) {
+            Move();
+        }
     }
 
     void Move() {
@@ -95,6 +99,10 @@ public class Player : MonoBehaviour {
 
     public void Damage(int dmg) {
         health -= dmg;
+        if(health <= 0) {
+            health = 0;
+            GameController.instance.GameOver();
+        }
         GameController.instance.UpdateLives(health);
         anim.SetTrigger("Hit");
         if(transform.rotation.y == 0) {
@@ -102,10 +110,6 @@ public class Player : MonoBehaviour {
         }
         if(transform.rotation.y == 180) {
             transform.position += new Vector3(-0.5f, 0, 0);
-        }
-
-        if(health <= 0) {
-            // game over
         }
     }
 
@@ -117,6 +121,12 @@ public class Player : MonoBehaviour {
     void OnCollisionEnter2D(Collision2D coll) {
         if(coll.gameObject.layer == 6) {
             isJumping = false;
+        }
+        if(coll.gameObject.layer == 7) {
+            health = 0;
+            GameController.instance.UpdateLives(health);
+            rig.velocity = new Vector2(0, 0);
+            GameController.instance.GameOver();
         }
     }
 }

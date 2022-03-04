@@ -6,11 +6,15 @@ public class Player : MonoBehaviour {
 
     public float speed;
     public float jumpForce;
-    private bool doubleJump;
+    public GameObject arrow;
+    public Transform firePoint;
 
+    private float movement;
+    private bool doubleJump;
     private Rigidbody2D rig;
     private Animator anim;
     private bool isJumping;
+    private bool isFire;
 
     void Start() {
         rig = GetComponent<Rigidbody2D>();
@@ -18,12 +22,16 @@ public class Player : MonoBehaviour {
     }
 
     void Update() {
-        Move();
         Jump();
+        BowFire();
+    }
+
+    void FixedUpdate() {
+        Move();
     }
 
     void Move() {
-        float movement = Input.GetAxis("Horizontal");
+        movement = Input.GetAxis("Horizontal");
         
         // adiciona velocidade no corpo do personagem no eixo x e y
         rig.velocity = new Vector2(movement * speed, rig.velocity.y);
@@ -39,7 +47,7 @@ public class Player : MonoBehaviour {
             }
             transform.eulerAngles = new Vector3(0, 180, 0);
         }
-        if(movement == 0 && !isJumping) {
+        if(movement == 0 && !isJumping && !isFire) {
             anim.SetInteger("transition", 0);
         }
     }
@@ -58,6 +66,28 @@ public class Player : MonoBehaviour {
                     doubleJump = false;
                 }
             }
+        }
+    }
+
+    void BowFire() {
+        StartCoroutine(Fire());
+    }
+
+    IEnumerator Fire() {
+        if(Input.GetKeyDown(KeyCode.E)) {
+            isFire = true;
+            anim.SetInteger("transition", 3);
+            GameObject arrowPrefab = Instantiate(arrow, firePoint.position, firePoint.rotation);
+
+            if(transform.rotation.y == 0) {
+                arrowPrefab.GetComponent<Arrow>().isRight = true;
+            }
+            if(transform.rotation.y == 180) {
+                arrowPrefab.GetComponent<Arrow>().isRight = false;
+            }
+
+            yield return new WaitForSeconds(0.2f);
+            isFire = false;
         }
     }
 

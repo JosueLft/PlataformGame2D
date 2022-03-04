@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour {
 
+    public int health = 3;
     public float speed;
     public float jumpForce;
     public GameObject arrow;
@@ -17,6 +18,7 @@ public class Player : MonoBehaviour {
     private bool isFire;
 
     void Start() {
+        GameController.instance.UpdateLives(health);
         rig = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
     }
@@ -89,6 +91,27 @@ public class Player : MonoBehaviour {
             yield return new WaitForSeconds(0.2f);
             isFire = false;
         }
+    }
+
+    public void Damage(int dmg) {
+        health -= dmg;
+        GameController.instance.UpdateLives(health);
+        anim.SetTrigger("Hit");
+        if(transform.rotation.y == 0) {
+            transform.position += new Vector3(-0.5f, 0, 0);
+        }
+        if(transform.rotation.y == 180) {
+            transform.position += new Vector3(-0.5f, 0, 0);
+        }
+
+        if(health <= 0) {
+            // game over
+        }
+    }
+
+    public void IncreaseHealth(int value) {
+        health += value;
+        GameController.instance.UpdateLives(health);
     }
 
     void OnCollisionEnter2D(Collision2D coll) {

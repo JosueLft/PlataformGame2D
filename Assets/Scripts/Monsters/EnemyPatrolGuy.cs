@@ -8,6 +8,7 @@ public class EnemyPatrolGuy : MonoBehaviour {
     public float walkTime;
     public bool walkRight = true;
     public int health;
+    public int damage;
 
     private float timer;
     private Rigidbody2D rig;
@@ -39,6 +40,12 @@ public class EnemyPatrolGuy : MonoBehaviour {
 
         if(health <= 0) {
             Destroy(gameObject);
+        }
+    }
+
+    void OnCollisionEnter2D(Collision2D collision) {
+        if(collision.gameObject.tag == "Player") {
+            collision.gameObject.GetComponent<Player>().Damage(damage);
         }
     }
 }
